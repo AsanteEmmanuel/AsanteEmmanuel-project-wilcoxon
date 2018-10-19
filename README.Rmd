@@ -10,23 +10,13 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-# project
+# project summary
 
-The goal of project is to ...
+The goal of project is to implement and investigate the behaviour of the Wilcoxon Rank Sum test statistic on pairs of sample drawn from the same population as against pairs of samples drawn from  different population distributions. The project is aimed to study the variation of this test statistic with the two cases and to examine the strength of the test as a dependant on the underlying sample.
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+I will also examine the behaviour of the test statistic if the two samples are from a symmetric distribution or not.
 
-```{r cars}
-summary(cars)
-summary(cars)
-```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
 
-You can also embed plots, for example:
 
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
