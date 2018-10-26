@@ -1,0 +1,50 @@
+---
+title: "Wilcoxon Project"
+author: "Emmanuel Asante"
+date: "10/25/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(tidyverse)
+library(rsample)
+set.seed(785363)
+```
+
+
+## Issue 1
+
+Generate samples from Poisson distribution. I will take a sample from Poisson distributions of two different rates and conduct a test of hypothesis on the two samples. Do this for 1000 simulated pairs of samples.
+
+```{r}
+
+# Generate two poisson samples whose sizes are not necessarily the same
+sample.1 <- rpois(10 + rbinom(1, size = 20, prob = 0.5), lambda = 10)
+sample.2 <- rpois(10 + rbinom(1, size = 20, prob = 0.5), lambda = 10)
+
+#Test the hypothesis that they both have the same mean(come from the same distribution)
+wilcox.test(sample_1, sample_2)
+
+
+# Create a dataframe to contain all the samples and computed values
+wilcox_table <- data_frame(index = 1:1000)
+
+# set number of simulations to 1000
+n_sim <- 1000
+
+wilcox_table <- wilcox_table %>% 
+  mutate(sample_1 = rerun(n_sim, rpois(30 + rbinom(1, size = 20, prob = 0.5), lambda = 10)),
+         sample_2 = rerun(n_sim, rpois(30 + rbinom(1, size = 20, prob = 0.5), lambda = 10)),
+         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y)$p.value)))
+
+# Type 1 error rate of the test on the samples of the same poisson population
+
+mean(wilcox_table$wilcox_pvalue<=0.05)
+
+```
+
