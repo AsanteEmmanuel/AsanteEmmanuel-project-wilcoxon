@@ -21,11 +21,11 @@ set.seed(785363)
 
 Generate samples from Poisson distribution. I will take a sample from Poisson distributions of two different rates and conduct a test of hypothesis on the two samples. Do this for 1000 simulated pairs of samples.
 
-```{r}
+```{r, warning=F, message=F}
 
 # Generate two poisson samples whose sizes are not necessarily the same
-sample.1 <- rpois(10 + rbinom(1, size = 20, prob = 0.5), lambda = 10)
-sample.2 <- rpois(10 + rbinom(1, size = 20, prob = 0.5), lambda = 10)
+sample_1 <- rpois(10 + rbinom(1, size = 20, prob = 0.5), lambda = 10)
+sample_2 <- rpois(10 + rbinom(1, size = 20, prob = 0.5), lambda = 10)
 
 #Test the hypothesis that they both have the same mean(come from the same distribution)
 wilcox.test(sample_1, sample_2)
@@ -46,5 +46,12 @@ wilcox_table <- wilcox_table %>%
 
 mean(wilcox_table$wilcox_pvalue<=0.05)
 
+```
+
+Add a column to indicate that the nULLL HYPOTHESIS IS rejected or not
+
+```{r}
+wilcox_table <- wilcox_table %>% 
+  mutate(Reject = ifelse(wilcox_pvalue <= 0.05, 1, 0))
 ```
 
