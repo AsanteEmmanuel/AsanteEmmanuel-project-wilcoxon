@@ -26,7 +26,7 @@ I will also examine the behaviour of the test statistic if the two samples are f
   
   
 ### Values(Output)
-  * **type_one_error_rate** A numeric scalar which represents the proportion of wilcoxon test p-values that resulted in a rejection of the Null Hypothesis
+  * **type_one_error_rate** A numeric scalar which represents the proportion of wilcoxon test p-values that resulted in a rejection of the Null Hypothesis.
   * **one_table** An object of type dataframe that contains the samples drawn, the p-value, and the Rejection decision (which is a logical vector).
 
 
