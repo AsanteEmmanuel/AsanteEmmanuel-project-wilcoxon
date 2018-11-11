@@ -40,7 +40,7 @@ n_sim <- 1000
 wilcox_table <- wilcox_table %>% 
   mutate(sample_1 = rerun(n_sim, rpois(30 + rbinom(1, size = 20, prob = 0.5), lambda = 10)),
          sample_2 = rerun(n_sim, rpois(30 + rbinom(1, size = 20, prob = 0.5), lambda = 10)),
-         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y)$p.value)))
+         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y, exact = FALSE)$p.value)))
 
 # Type 1 error rate of the test on the samples of the same poisson population
 
@@ -67,30 +67,58 @@ n_sim <- 1000
 wilcox_table <- wilcox_table %>% 
   mutate(sample_1 = rerun(n_sim, rpois(30 + rbinom(1, size = 20, prob = 0.5), lambda = 10)),
          sample_2 = rerun(n_sim, rpois(30 + rbinom(1, size = 20, prob = 0.5), lambda = 10)),
-         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y)$p.value)))
+         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y, exact = F)$p.value)))
 
 
 # Write a function for One table
+# Did Charlotte say that we need a separate file for each function?
 
 wilcox_one_table <- function(table_length = 1000, sample_from = rpois, ..., alpha = 0.05){
   wilcox_table <- data_frame(index = 1:table_length)
   wilcox_table <- wilcox_table %>% 
   mutate(sample_1 = rerun(table_length, sample_from(30 + rbinom(1, size = 20, prob = 0.5), ...)),
          sample_2 = rerun(table_length, sample_from(30 + rbinom(1, size = 20, prob = 0.5), ...)),
-         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y, exact = FALSE)$p.value)), 
+         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y, exact = FALSE, conf.level = 1 - alpha)$p.value)), 
          Reject = ifelse(wilcox_pvalue <= alpha, TRUE, FALSE))
-  output <- list(type_1_error_rate = mean(wilcox_table$Reject), one_table = wilcox_table)
-  print(output)
+  #output <- list(type_1_error_rate = mean(wilcox_table$Reject), one_table = wilcox_table)
+  output <- mean(wilcox_table$Reject)
+  # Invisible function prevents the output from showing
+  invisible(output)
 }
 
+## Example using the wilcox_one_table function
 aa <- wilcox_one_table(table_length = 1000, sample_from = rpois, alpha = 0.05, lambda = 20)
 
-##### Write function
-# Probably use append
+```
 
-wilcox_error_rate <- function(number_tables = 1000, distribution = rpois, ...){
-  
+
+Write function to do several more of wilcox_one_table
+
+```{r}
+##### Write function to do several more of wilcox_one_table
+
+# Probably use append
+rates <- flatten_dbl(rerun(10, wilcox_one_table(table_length = 1000, sample_from = rpois, alpha = 0.05, lambda = 20)))
+mean.default(rates)
+
+# Put the above into a function
+
+type_one_error <- function(n_sims = 100, table_length = 100){
+  means_vector <- NULL
+  for(i in 1:n_sims){
+    rates = flatten_dbl(rerun(10, wilcox_one_table(table_length = table_length, sample_from = rpois, alpha = 0.05, lambda = 20)))
+    table_rate = mean.default(rates)
+    # Append the latest mean rate
+    means_vector = append(means_vector, table_rate)
+  }
+ output = list(means_vector = means_vector)
+ print(output)
 }
+
+# Or Use rerun() to generate even more
+# wilcox_error_rate <- function(number_tables = 1000, distribution = rpois, ...){
+#   
+# }
 
 ```
 
