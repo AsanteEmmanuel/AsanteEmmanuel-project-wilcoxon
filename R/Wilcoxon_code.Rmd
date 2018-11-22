@@ -101,23 +101,25 @@ Turns out this may not be necessary because generating several of the wilcox tab
 ##### Write function to do several more of wilcox_one_table
 
 # Probably use append
-rates <- flatten_dbl(rerun(10, wilcox_one_table(table_length = 1000, sample_from = rpois, alpha = 0.05, lambda = 20)))
-mean.default(rates)
+############################################
+# rates <- flatten_dbl(rerun(10, wilcox_one_table(table_length = 1000, sample_from = rpois, alpha = 0.05, lambda = 20)))
+# mean.default(rates)
+# 
+# # Put the above into a function
+# 
+# type_one_error <- function(n_sims = 100, table_length = 100){
+#   means_vector <- NULL
+#   for(i in 1:n_sims){
+#     rates = flatten_dbl(rerun(10, wilcox_one_table(table_length = table_length, sample_from = rpois, alpha = 0.05, lambda = 20)))
+#     table_rate = mean.default(rates)
+#     # Append the latest mean rate
+#     means_vector = append(means_vector, table_rate)
+#   }
+#  output = list(means_vector = means_vector)
+#  print(output)
+# }
 
-# Put the above into a function
-
-type_one_error <- function(n_sims = 100, table_length = 100){
-  means_vector <- NULL
-  for(i in 1:n_sims){
-    rates = flatten_dbl(rerun(10, wilcox_one_table(table_length = table_length, sample_from = rpois, alpha = 0.05, lambda = 20)))
-    table_rate = mean.default(rates)
-    # Append the latest mean rate
-    means_vector = append(means_vector, table_rate)
-  }
- output = list(means_vector = means_vector)
- print(output)
-}
-
+################################################################
 # Or Use rerun() to generate even more
 # wilcox_error_rate <- function(number_tables = 1000, distribution = rpois, ...){
 #   
@@ -181,5 +183,20 @@ rate_df <- expand.grid(rate_df)
 rate_df <- rate_df %>%
   mutate(rejection_rate = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$reject_rate)),
          avg_size_diff = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$average_size_diff)))
+
+
+```
+
+### Plot 
+
+```{r}
+## Make a plot to investigate the relationship between difference in sample size, the poisson lambda and the rejection rate.
+
+# Polish the plot
+
+ggplot(rate_df) +
+  geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(lambdas))) +
+  facet_wrap(~lambdas) +
+  theme_bw()
 ```
 
