@@ -94,7 +94,8 @@ aa <- wilcox_one_table(table_length = 1000, sample_from = rpois, alpha = 0.05, l
 ```
 
 
-Write function to do several more of wilcox_one_table
+Write function to do several more of wilcox_one_table:
+Turns out this may not be necessary because generating several of the wilcox tables and taking the average of the average rejection rates obtained in each wilcox table is similar to generating one giant table and taking the average rejection rate. Hence I try the method below instead.
 
 ```{r}
 ##### Write function to do several more of wilcox_one_table
@@ -124,11 +125,61 @@ type_one_error <- function(n_sims = 100, table_length = 100){
 
 ```
 
+
+### Introduce naive difference
 Here I will edit the wilcox_one_table function to take a naive rate as an argument. Then I will use `map2` function to find the rejection rate and the
 average absolute difference of the sample sizes in each test(row) of the wilcox table. Then I will make a plot of average difference in sample size on the x-axis, lambda as the y-axis and the rejection rate as the third dimension.Before the plot I ill put those variables in a dataframe and then use it as the ggplot input dataset.
 
-
+I set it to 30 + naive difference to ensure symmetry.
 ```{r}
+wilcox_one_table <- function(table_length = 1000,naive_difference = 0, sample_from = rpois, ..., alpha = 0.05, lambda = 20){
+  #naive_difference is to tune the absolute difference between the two sample sizes.
+  wilcox_table <- data_frame(index = 1:table_length)
+  wilcox_table <- wilcox_table %>% 
+  mutate(sample_1 = rerun(table_length, sample_from(30 + naive_difference + rbinom(1, size = 20, prob = 0.5), ...)),
+         sample_2 = rerun(table_length, sample_from(30 + rbinom(1, size = 20, prob = 0.5), ...)),
+         sample_1_size = map_dbl(sample_1, ~length(.x)),
+         sample_2_size = map_dbl(sample_2, ~length(.x)),
+         size_difference = abs(sample_1_size - sample_2_size),
+         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y, exact = FALSE, conf.level = 1 - alpha)$p.value)), 
+         Reject = ifelse(wilcox_pvalue <= alpha, TRUE, FALSE))
+  #output <- list(type_1_error_rate = mean(wilcox_table$Reject), one_table = wilcox_table)
+  output <- list(reject_rate = mean(wilcox_table$Reject), 
+                 table = wilcox_table,
+                 average_size_diff = mean(wilcox_table$size_difference))
+  # Output is the rejection rate
+  # Invisible function prevents the output from showing
+  invisible(output)
+}
 
+
+```
+
+
+### Rejection rates dataframe
+```{r}
+# I set the various lambda rates 
+
+lambdas <- seq(from = 20, to = 90, by = 10)
+
+# Set the values for naive difference 
+naive_differences <- seq(from = 0, to = 70, by = 10)
+
+# make a dataframe of all possible pairings of the lambdas and naive_differences
+rate_df <- data.frame(naive_differences, lambdas)
+rate_df <- expand.grid(rate_df)
+
+# Example with these guys
+# rate_df <- rate_df %>%
+#   mutate(summ = map2_dbl(lambdas,naive_differences, ~sum(.x, .y)),
+#          summ2 = map2_dbl(lambdas,summ, ~sum(.x, .y)))
+
+# and use map2 to run the wilcox_one_table function on the different values. # Obtain the average
+
+
+
+rate_df <- rate_df %>%
+  mutate(rejection_rate = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$reject_rate)),
+         avg_size_diff = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$average_size_diff)))
 ```
 
