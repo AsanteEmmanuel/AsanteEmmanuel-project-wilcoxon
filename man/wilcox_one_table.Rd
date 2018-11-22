@@ -2,20 +2,23 @@
 % Please edit documentation in R/wilcox_one_table.R
 \name{wilcox_one_table}
 \alias{wilcox_one_table}
-\title{Function to generate a table to Conduct Wilcoxon Test on}
+\title{Function to generate a table to Conduct Wilcoxon Test on each row.}
 \usage{
 wilcox_one_table(table_length = 1000, sample_from = rpois, ...,
   alpha = 0.05)
 }
 \arguments{
-\item{table_length}{}
+\item{table_length}{length of table you want to generate or the number of sample pairs you want to run the hypothesis test on.}
 
-\item{sample_from}{}
+\item{sample_from}{Distribution to sample from e.g. rpois}
 
-\item{...}{}
+\item{...}{Arguments that may be passed to the sample_from distribution}
 
-\item{alpha}{}
+\item{alpha}{Significance level}
+}
+\value{
+returns the rejection rate of the entire table. i.e. how many of the hypothesis were rejected when compared to alpha
 }
 \description{
-Function to generate a table to Conduct Wilcoxon Test on
+Function to generate a table to Conduct Wilcoxon Test on each row.
 }

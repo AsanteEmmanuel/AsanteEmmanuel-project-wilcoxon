@@ -48,7 +48,7 @@ mean(wilcox_table$wilcox_pvalue<=0.05)
 
 ```
 
-Add a column to indicate that the nULLL HYPOTHESIS IS rejected or not
+Add a column to indicate that the Null Hypothesis is rejected or not
 
 ```{r}
 wilcox_table <- wilcox_table %>% 
@@ -82,9 +82,11 @@ wilcox_one_table <- function(table_length = 1000, sample_from = rpois, ..., alph
          Reject = ifelse(wilcox_pvalue <= alpha, TRUE, FALSE))
   #output <- list(type_1_error_rate = mean(wilcox_table$Reject), one_table = wilcox_table)
   output <- mean(wilcox_table$Reject)
+  # Output is the rejection rate
   # Invisible function prevents the output from showing
   invisible(output)
 }
+
 
 ## Example using the wilcox_one_table function
 aa <- wilcox_one_table(table_length = 1000, sample_from = rpois, alpha = 0.05, lambda = 20)

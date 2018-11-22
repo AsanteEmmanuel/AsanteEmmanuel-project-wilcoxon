@@ -1,12 +1,12 @@
 
-#' Function to generate a table to Conduct Wilcoxon Test on
+#' Function to generate a table to Conduct Wilcoxon Test on each row.
 #'
-#' @param table_length 
-#' @param sample_from 
-#' @param ... 
-#' @param alpha 
+#' @param table_length length of table you want to generate or the number of sample pairs you want to run the hypothesis test on.
+#' @param sample_from Distribution to sample from e.g. rpois
+#' @param ... Arguments that may be passed to the sample_from distribution
+#' @param alpha Significance level
 #'
-#' @return
+#' @return returns the rejection rate of the entire table. i.e. how many of the hypothesis were rejected when compared to alpha
 #' @export
 #'
 #' @examples
