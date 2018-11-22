@@ -81,7 +81,7 @@ wilcox_one_table <- function(table_length = 1000, sample_from = rpois, ..., alph
          wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y, exact = FALSE, conf.level = 1 - alpha)$p.value)), 
          Reject = ifelse(wilcox_pvalue <= alpha, TRUE, FALSE))
   #output <- list(type_1_error_rate = mean(wilcox_table$Reject), one_table = wilcox_table)
-  output <- mean(wilcox_table$Reject)
+  output <- list(reject_rate = mean(wilcox_table$Reject), table = wilcox_table)
   # Output is the rejection rate
   # Invisible function prevents the output from showing
   invisible(output)
@@ -121,6 +121,14 @@ type_one_error <- function(n_sims = 100, table_length = 100){
 # wilcox_error_rate <- function(number_tables = 1000, distribution = rpois, ...){
 #   
 # }
+
+```
+
+Here I will edit the wilcox_one_table function to take a naive rate as an argument. Then I will use `map2` function to find the rejection rate and the
+average absolute difference of the sample sizes in each test(row) of the wilcox table. Then I will make a plot of average difference in sample size on the x-axis, lambda as the y-axis and the rejection rate as the third dimension.Before the plot I ill put those variables in a dataframe and then use it as the ggplot input dataset.
+
+
+```{r}
 
 ```
 
