@@ -205,7 +205,30 @@ The rejection rates seem to be approximately uniform for the different sizes of 
 ## Symmetric Beta  Samples
 
 ```{r}
-# Use the wilcox_one_table function to run the tests on Beta samples
+
+# I set the various shape1 and shape2 rates 
+shape_1 <- seq(from = 5, to = 30, by = 5)
+
+# Set the values for naive difference 
+naive_differences <- seq(from = 0, to = 50, by = 10)
+
+# make a dataframe of all possible pairings of the parameters and naive_differences
+rate_beta <- data.frame(naive_differences, shape_1)
+rate_beta <- expand.grid(rate_beta)
+
+# add column of shape_1 as shape_2
+rate_beta <- rate_beta %>% 
+  mutate(shape_2 = shape_1)
+
+
+# Use pmap to obtain the rejection rates for different parameter combinations.
+
+rate_beta <- rate_beta %>%
+  mutate(rejection_rate = flatten_dbl(pmap(naive_differences, shape_1, shape_2, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$reject_rate)),
+         avg_size_diff = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$average_size_diff)))
+
+#Use pmap or just edit the wilcox_on_table function by putting the shape1 and shape2 as arguments
+
 ```
 
 
