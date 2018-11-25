@@ -199,4 +199,20 @@ ggplot(rate_df) +
   facet_wrap(~lambdas) +
   theme_bw()
 ```
+The rejection rates seem to be approximately uniform for the different sizes of lambda over all the various values of differences in sample sizes. This may show that the difference in sample sizes may not(subject to further investiigation) a significant effect on the rejection rate of the wilcoxon Rank sum test.This can be said of samples that are taken fro the symmetric( $\lambda \ge 20$) poisson population. In order naively infer this observation to other symmetric distributions, I will use another symmetric distribution to investigate this observation.
+
+
+## Symmetric Beta  Samples
+
+```{r}
+# Use the wilcox_one_table function to run the tests on Beta samples
+```
+
+
+
+
+
+
+
+
 
