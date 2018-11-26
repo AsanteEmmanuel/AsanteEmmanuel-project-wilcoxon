@@ -197,6 +197,8 @@ rate_df <- rate_df %>%
 ggplot(rate_df) +
   geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(lambdas))) +
   facet_wrap(~lambdas) +
+  xlab("Average Difference in Sample Sizes") +
+  ylab("Rejection Rate") +
   theme_bw()
 ```
 The rejection rates seem to be approximately uniform for the different sizes of lambda over all the various values of differences in sample sizes. This may show that the difference in sample sizes may not(subject to further investiigation) a significant effect on the rejection rate of the wilcoxon Rank sum test.This can be said of samples that are taken fro the symmetric( $\lambda \ge 20$) poisson population. In order naively infer this observation to other symmetric distributions, I will use another symmetric distribution to investigate this observation.
@@ -206,34 +208,107 @@ The rejection rates seem to be approximately uniform for the different sizes of 
 
 ```{r}
 
-# I set the various shape1 and shape2 rates 
-shape_1 <- seq(from = 5, to = 30, by = 5)
+# # I set the various shape1 and shape2 rates 
+# shape_1 <- seq(from = 5, to = 30, by = 5)
+# 
+# # Set the values for naive difference 
+# naive_differences <- seq(from = 0, to = 50, by = 10)
+# 
+# # make a dataframe of all possible pairings of the parameters and naive_differences
+# rate_beta <- data.frame(naive_differences, shape_1)
+# rate_beta <- expand.grid(rate_beta)
+# 
+# # add column of shape_1 as shape_2
+# rate_beta <- rate_beta %>% 
+#   mutate(shape_2 = shape_1)
+# 
+# 
+# # Use pmap to obtain the rejection rates for different parameter combinations.
+# 
+# rate_beta <- rate_beta %>%
+#   mutate(rejection_rate = flatten_dbl(pmap(naive_differences, shape_1, shape_2, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$reject_rate)),
+#          avg_size_diff = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$average_size_diff)))
+# 
+# #Use pmap or just edit the wilcox_on_table function by putting the shape1 and shape2 as arguments
+
+```
+
+# Use on Normal Samples( Symmetric Case)
+
+```{r}
+#Tune wilcox_one_table_function to fit normal samples
+
+wilcox_norm_table <- function(table_length = 1000,naive_difference = 0, sample_from = rnorm, ..., alpha = 0.05, mean = 0, sd = 1){
+  #naive_difference is to tune the absolute difference between the two sample sizes.
+  wilcox_table <- data_frame(index = 1:table_length)
+  wilcox_table <- wilcox_table %>% 
+  mutate(sample_1 = rerun(table_length, sample_from(30 + naive_difference + rbinom(1, size = 20, prob = 0.5), ...)),
+         sample_2 = rerun(table_length, sample_from(30 + rbinom(1, size = 20, prob = 0.5), ...)),
+         sample_1_size = map_dbl(sample_1, ~length(.x)),
+         sample_2_size = map_dbl(sample_2, ~length(.x)),
+         size_difference = abs(sample_1_size - sample_2_size),
+         wilcox_pvalue = flatten_dbl(map2(sample_1, sample_2, ~wilcox.test(.x, .y, exact = FALSE, conf.level = 1 - alpha)$p.value)), 
+         Reject = ifelse(wilcox_pvalue <= alpha, TRUE, FALSE))
+  #output <- list(type_1_error_rate = mean(wilcox_table$Reject), one_table = wilcox_table)
+  output <- list(reject_rate = mean(wilcox_table$Reject), 
+                 table = wilcox_table,
+                 average_size_diff = mean(wilcox_table$size_difference))
+  # Output is the rejection rate
+  # Invisible function prevents the output from showing
+  invisible(output)
+}
+```
+
+```{r}
+# I set the various lambda rates 
+
+means <- seq(from = 0, to = 10, by = 1)
 
 # Set the values for naive difference 
-naive_differences <- seq(from = 0, to = 50, by = 10)
+naive_differences <- seq(from = 0, to = 100, by = 10)
 
-# make a dataframe of all possible pairings of the parameters and naive_differences
-rate_beta <- data.frame(naive_differences, shape_1)
-rate_beta <- expand.grid(rate_beta)
+# make a dataframe of all possible pairings of the lambdas and naive_differences
+rate_normal <- data.frame(naive_differences, means)
+rate_normal <- expand.grid(rate_normal)
 
-# add column of shape_1 as shape_2
-rate_beta <- rate_beta %>% 
-  mutate(shape_2 = shape_1)
+# Example with these guys
+# rate_df <- rate_df %>%
+#   mutate(summ = map2_dbl(means,naive_differences, ~sum(.x, .y)),
+#          summ2 = map2_dbl(means,summ, ~sum(.x, .y)))
+
+# and use map2 to run the wilcox_one_table function on the different values. # Obtain the average
 
 
-# Use pmap to obtain the rejection rates for different parameter combinations.
 
-rate_beta <- rate_beta %>%
-  mutate(rejection_rate = flatten_dbl(pmap(naive_differences, shape_1, shape_2, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$reject_rate)),
-         avg_size_diff = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$average_size_diff)))
-
-#Use pmap or just edit the wilcox_on_table function by putting the shape1 and shape2 as arguments
+rate_normal <- rate_normal %>%
+  mutate(rejection_rate = flatten_dbl(map2(naive_differences, means, ~wilcox_norm_table(table_length = 1000, alpha = 0.05, sample_from = rnorm,sd = 1, .x, .y)$reject_rate)),
+         avg_size_diff = flatten_dbl(map2(naive_differences, means, ~wilcox_norm_table(table_length = 1000, alpha = 0.05, sample_from = rnorm, sd = 1,  .x, .y)$average_size_diff)))
 
 ```
 
 
+### Plot 
+
+```{r}
+## Make a plot to investigate the relationship between difference in sample size, the poisson lambda and the rejection rate.
+
+# Polish the plot
+
+ggplot(rate_normal) +
+  geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(means))) +
+  facet_wrap(~means) +
+  xlab("Average Difference in Sample Sizes") +
+  ylab("Rejection Rate") +
+  theme_bw()
+```
+
+The rejection rates seem to fluctuate about 0.05o irrespective of the combination of the sample size difference and the mean combination.
 
 
+
+
+
+# Examine Poisson with shift.
 
 
 
