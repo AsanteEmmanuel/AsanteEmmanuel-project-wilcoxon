@@ -196,12 +196,13 @@ rate_df <- rate_df %>%
 
 ggplot(rate_df) +
   geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(lambdas))) +
+  geom_smooth(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(lambdas)), se = F, method = "lm") +
   facet_wrap(~lambdas) +
   xlab("Average Difference in Sample Sizes") +
   ylab("Rejection Rate") +
   theme_bw()
 ```
-The rejection rates seem to be approximately uniform for the different sizes of lambda over all the various values of differences in sample sizes. This may show that the difference in sample sizes may not(subject to further investiigation) a significant effect on the rejection rate of the wilcoxon Rank sum test.This can be said of samples that are taken fro the symmetric( $\lambda \ge 20$) poisson population. In order naively infer this observation to other symmetric distributions, I will use another symmetric distribution to investigate this observation.
+The rejection rates seem to be approximately uniform for the different sizes of lambda over all the various values of differences in sample sizes. This may show that the difference in sample sizes may not(subject to further investiigation) a significant effect on the rejection rate of the wilcoxon Rank sum test.This can be said of samples that are taken from the same symmetric( $\lambda \ge 20$) population. In order naively infer this observation to other symmetric distributions, I will use another symmetric distribution to investigate this observation.
 
 
 ## Symmetric Beta  Samples
@@ -380,6 +381,8 @@ ggplot(rate_skew_poisson) +
   ylab("Power") +
   theme_bw()
 ```
+
+This results in an interesting case in which for $\lambda = 1, 2, 3, 4$, the average power of the test is $power = 1, 0.8, 0.6, 0.4$ respectively for all sample sizes taken. For  $\lambda = 5, 6, 7, 8$, the power seem to rise again on average. The powers fluctuate about $power = 0.6, 0.8, 1 , 1 $ respectively. It is worth noting , however, that for cases where $\lambda = 4, 5, 6, 7$, the powers seem to increaes slightly on average as sample size differences increases. I find this result interesting. This is because it seems to give a hint that the difference in sample sizes have an effect on the power of the Wilcoxon Rank Sum Test when the samples come from asymmetric distributions.   
 
 
 
