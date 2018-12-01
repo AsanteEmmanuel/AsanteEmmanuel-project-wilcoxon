@@ -2,7 +2,10 @@
 title: "Wilcoxon Rank Sum Test Project Report"
 author: "Emmanuel Asante"
 date: "12/1/2018"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The Wilcoxon Rank Sum Test is a a non-parametric Test that is used to test if samples come from the same distribution by testing if they have the same centers (usually median). The hypothesis of the tests are:
 
-$ H_0 $: The two populations have the same distribution.
+$ H_0 $: The two populations have the same distribution.   
 $ H_1 $: The two populations from different distributions.
 
 ### Assumptions:
@@ -33,17 +36,24 @@ My interest was to investigate the relationship between rejection rates and the 
 
 # Results
 
-The rejection rates seem to be approximately uniform for the different sizes of lambda for most of the various values of differences in sample sizes. This may show that the difference in sample sizes may not(subject to further investiigation) a significant effect on the rejection rate of the wilcoxon Rank sum test.This can be said of samples that are taken from the same symmetric( $\lambda \ge 20$) population. In order naively infer this observation to other symmetric distributions, I will use another symmetric distribution to investigate this observation
+### Poisson Population Case
 
-```{r echo=FALSE, out.width='100%'}
+The rejection rates seem to be approximately uniform for the different sizes of lambda for most of the various values of differences in sample sizes. This may show that the difference in sample sizes may not(subject to further investiigation) a significant effect on the rejection rate of the wilcoxon Rank sum test.This can be said of samples that are taken from the same symmetric( $\lambda \ge 20$) population. In order naively infer this observation to other symmetric distributions, I will use another symmetric distribution to investigate this observation.
+
+### Normal Population Case
+
+The rejection rates seem to fluctuate about 0.050 irrespective of the combination of the sample size difference and the mean combination. The rejection rates seem to deecrease for increasing sample size differences in cases where the population mean is 0, 1, 4, 9, 10. It is increasing for the other cases although the slopes are small except for when the mean = 7.
+
+```{r echo=FALSE, out.width='.49\\linewidth', fig.width=3, fig.height=3}
 knitr::include_graphics('./pic_1.png')
+knitr::include_graphics('./symmetric_normal.png')
 ```
 
 
 
-
-
-
+```{r echo=FALSE, out.width='100%', fig.height = 0.1, fig.width=0.3}
+#knitr::include_graphics('./symmetric_normal.png')
+```
 
 
 
