@@ -4,7 +4,7 @@
   
   * I will record in a data frame if I reject the hypothesis that the two samples come from the same distribution or not.
   
-  * Take the average of the logical vector (column) of TRUE and FALSE values to obtain the power of the test.
+  * Take the average of the logical vector (column) of TRUE and FALSE values to obtain the rejection rate of the test.
   
   * Do this using different shifted symmetric distributions. About 1000 different shifted pairs of distributions.
   
