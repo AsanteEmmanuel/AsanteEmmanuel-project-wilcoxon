@@ -1,0 +1,16 @@
+---
+title: "Extra Work (Attempted)"
+author: "Emmanuel Asante"
+date: "12/2/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Attempted Extra Work
+ * Tried to coerce all wilcox_one_table function to take all possible probability distributions in R but failed.
+ * I tried to simulate symmetric Beta samples for the test but failed to match `map()` function to the input parameters of `rbeta()`
+ * Used `bench::mark()` on my functions but the code kept running until I restarted the r-session
+ * Used the console to manualLY identify the relationship between poisson lambda and exponential rate in order to ensure that the assumption of equal variance was satisfied.
