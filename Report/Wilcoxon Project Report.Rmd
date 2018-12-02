@@ -40,36 +40,43 @@ My interest was to investigate the relationship between rejection rates and the 
 
 The rejection rates seem to be approximately uniform for the different sizes of lambda for most of the various values of differences in sample sizes. This may show that the difference in sample sizes may not(subject to further investiigation) a significant effect on the rejection rate of the wilcoxon Rank sum test.This can be said of samples that are taken from the same symmetric( $\lambda \ge 20$) population. In order naively infer this observation to other symmetric distributions, I will use another symmetric distribution to investigate this observation.
 
+```{r echo=FALSE, out.width='.89\\linewidth', fig.width=3, fig.height=3}
+knitr::include_graphics('./pic_1.png')
+#knitr::include_graphics('./symmetric_normal.png')
+```
+
 ### Normal Population Case
 
 The rejection rates seem to fluctuate about 0.050 irrespective of the combination of the sample size difference and the mean combination. The rejection rates seem to deecrease for increasing sample size differences in cases where the population mean is 0, 1, 4, 9, 10. It is increasing for the other cases although the slopes are small except for when the mean = 7.
 
-```{r echo=FALSE, out.width='.49\\linewidth', fig.width=3, fig.height=3}
-knitr::include_graphics('./pic_1.png')
+```{r echo=FALSE, out.width='.89\\linewidth', fig.width=3, fig.height=3}
+#knitr::include_graphics('./pic_1.png')
 knitr::include_graphics('./symmetric_normal.png')
 ```
 
+### Different Skewed populations with same variance
 
+For different Skewed populations with same variance, I observed that the power of the test for the case where the $\lambda = 2$ seem to increase with increasing sample size differences. Curiously, for $\lambda = 1$, I obtain the rejection rate to be almost 0.
 
-```{r echo=FALSE, out.width='100%', fig.height = 0.1, fig.width=0.3}
-#knitr::include_graphics('./symmetric_normal.png')
+```{r echo=FALSE, out.width='.89\\linewidth', fig.width=3, fig.height=3}
+knitr::include_graphics('./asymmetric_pois_exp.png')
 ```
 
 
 
 
+# Future Work
+
+Future work should further investigate the findings for   
+1. several other population distributions.  
+2. Also the assumptions should be tested for different values of parameters.
 
 
 
-
-
-
-
-
-
-
-
+\newpage
 
 # References
 
-1. University of Virginia Library : data.library.virginia.edu/the-wilcoxon-rank-sum-test
+1. University of Virginia Library :[link](data.library.virginia.edu/the-wilcoxon-rank-sum-test)
+2. Dr. Charlotte Wickham's Notes for ST 541 Fall 2018.
+2. R4DS by Dr. Hadley Wickham
