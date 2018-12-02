@@ -184,6 +184,8 @@ rate_df <- rate_df %>%
   mutate(rejection_rate = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$reject_rate)),
          avg_size_diff = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_one_table(table_length = 1000, alpha = 0.05, sample_from = rpois, .x, .y)$average_size_diff)))
 
+rate_df <- rate_df %>% 
+  mutate(Lambda = factor(lambdas))
 
 ```
 
@@ -195,11 +197,12 @@ rate_df <- rate_df %>%
 # Polish the plot
 
 ggplot(rate_df) +
-  geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(lambdas))) +
-  geom_smooth(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(lambdas)), se = F, method = "lm") +
+  geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = Lambda)) +
+  geom_smooth(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = Lambda), se = F, method = "lm") +
   facet_wrap(~lambdas) +
   xlab("Average Difference in Sample Sizes") +
   ylab("Rejection Rate") +
+  ggtitle("Rejection Rate vs Sample Size Difference", subtitle = "The rejection rates seem to be about 0.05 in all cases") +
   theme_bw()
 ```
 The rejection rates seem to be approximately uniform for the different sizes of lambda over all the various values of differences in sample sizes. This may show that the difference in sample sizes may not(subject to further investiigation) a significant effect on the rejection rate of the wilcoxon Rank sum test.This can be said of samples that are taken from the same symmetric( $\lambda \ge 20$) population. In order naively infer this observation to other symmetric distributions, I will use another symmetric distribution to investigate this observation.
@@ -285,6 +288,11 @@ rate_normal <- rate_normal %>%
   mutate(rejection_rate = flatten_dbl(map2(naive_differences, means, ~wilcox_norm_table(table_length = 1000, alpha = 0.05, sample_from = rnorm,sd = 1, .x, .y)$reject_rate)),
          avg_size_diff = flatten_dbl(map2(naive_differences, means, ~wilcox_norm_table(table_length = 1000, alpha = 0.05, sample_from = rnorm, sd = 1,  .x, .y)$average_size_diff)))
 
+
+rate_normal <- rate_normal %>%
+  mutate(Mean = factor(means))
+
+
 ```
 
 
@@ -296,30 +304,33 @@ rate_normal <- rate_normal %>%
 # Polish the plot
 
 ggplot(rate_normal) +
-  geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(means))) +
-  facet_wrap(~means) +
+  geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = Mean)) +
+  geom_smooth(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = Mean), se = F, method = "lm") +
+  facet_wrap(~Mean) +
   xlab("Average Difference in Sample Sizes") +
   ylab("Rejection Rate") +
+  ggtitle("Rejection Rate vs Sample Size Difference For Normal Samples", subtitle = "The rejection rates seem to be about 0.05 in all cases") +
   theme_bw()
 ```
 
-The rejection rates seem to fluctuate about 0.050 irrespective of the combination of the sample size difference and the mean combination.
+The rejection rates seem to fluctuate about 0.050 irrespective of the combination of the sample size difference and the mean combination. The rejection rates seem to deecrease for increasing sample size differences in cases where the population mean is 0, 1, 4, 9, 10. It is increasing for the other cases although the slopes are small except for when the mean = 7.
 
 
 
 
 
-# Examine Poisson with shift.
+# Examine Poisson and Exponential with same variance.
+
 Using different rates for lambda, I examine the rates
 
 ```{r}
 
-wilcox_skew_table <- function(table_length = 1000,naive_difference = 0, sample_from = rpois, alpha = 0.05,..., lambda = 1){
+wilcox_skew_table <- function(table_length = 1000,naive_difference = 0, sample_from = rpois, sample_from_2 = rexp, alpha = 0.05,..., lambda = 1){
   #naive_difference is to tune the absolute difference between the two sample sizes.
   wilcox_table <- data_frame(index = 1:table_length)
   wilcox_table <- wilcox_table %>% 
   mutate(sample_1 = rerun(table_length, sample_from(10 + naive_difference + rbinom(1, size = 20, prob = 0.5), ...)),
-         sample_2 = rerun(table_length, sample_from(10 + rbinom(1, size = 20, prob = 0.5), lambda = lambda + round(runif(min = 1, max = 4, 1)))),
+         sample_2 = rerun(table_length, sample_from_2(10 + rbinom(1, size = 20, prob = 0.5), rate = sqrt(1 / lambda))),
          sample_1_size = map_dbl(sample_1, ~length(.x)),
          sample_2_size = map_dbl(sample_2, ~length(.x)),
          size_difference = abs(sample_1_size - sample_2_size),
@@ -347,21 +358,24 @@ lambdas <- seq(from = 1, to = 8, by = 1)
 naive_differences <- seq(from = 0, to = 70, by = 10)
 
 # make a dataframe of all possible pairings of the lambdas and naive_differences
-rate_skew_poisson <- data.frame(naive_differences, lambdas)
-rate_skew_poisson <- expand.grid(rate_skew_poisson)
+rate_skew <- data.frame(naive_differences, lambdas)
+rate_skew <- expand.grid(rate_skew_poisson)
 
-# Example with these guys
-# rate_df <- rate_df %>%
-#   mutate(summ = map2_dbl(lambdas,naive_differences, ~sum(.x, .y)),
-#          summ2 = map2_dbl(lambdas,summ, ~sum(.x, .y)))
+# # Example with these guys
+# rate_dframe <- rate_df %>%
+# mutate(summ = map2_dbl(lambdas,naive_differences, ~sum(.x, .y)),
+#           summ2 = map2_dbl(lambdas,summ, ~sum(.x, .y)))
 
-# and use map2 to run the wilcox_one_table function on the different values. # Obtain the average
+# # and use map2 to run the wilcox_one_table function on the different values. # Obtain the average
 
 
 
-rate_skew_poisson <- rate_skew_poisson %>%
-  mutate(rejection_rate = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_skew_table(table_length = 100, alpha = 0.05, sample_from = rpois, .x, .y)$reject_rate)),
-         avg_size_diff = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_skew_table(table_length = 100, alpha = 0.05, sample_from = rpois, .x, .y)$average_size_diff)))
+rate_skew <- rate_skew %>%
+  mutate(rejection_rate = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_skew_table(table_length = 100, alpha = 0.05, sample_from = rpois,sample_from_2 = rexp, .x, .y)$reject_rate)),
+         avg_size_diff = flatten_dbl(map2(naive_differences, lambdas, ~wilcox_skew_table(table_length = 100, alpha = 0.05, sample_from = rpois,sample_from_2 = rexp, .x, .y)$average_size_diff)))
+
+rate_skew <- rate_skew %>%
+  mutate(Lambda = factor(lambdas))
 
 
 ```
@@ -374,11 +388,12 @@ rate_skew_poisson <- rate_skew_poisson %>%
 
 # Polish the plot
 
-ggplot(rate_skew_poisson) +
-  geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = factor(lambdas))) +
-  facet_wrap(~lambdas) +
+ggplot(rate_skew) +
+  geom_point(mapping = aes(x = round(avg_size_diff), y = rejection_rate, col = Lambda)) +
+  facet_wrap(~Lambda) +
   xlab("Average Difference in Sample Sizes") +
   ylab("Power") +
+  ggtitle("Power for different Sample Size Differences", subtitle = "The Power of the Test is almost 1 for most cases") +
   theme_bw()
 ```
 
