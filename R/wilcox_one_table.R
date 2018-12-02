@@ -9,7 +9,7 @@
 #' @return returns the rejection rate of the entire table. i.e. how many of the hypothesis were rejected when compared to alpha
 #' @export
 #'
-#' @examples
+#' @examples wilcox_one_table(table_length = 1000, sample_from = rpois, alpha = 0.05, lambda = 20)
 wilcox_one_table <- function(table_length = 1000, sample_from = rpois, ..., alpha = 0.05){
   wilcox_table <- data_frame(index = 1:table_length)
   wilcox_table <- wilcox_table %>% 

@@ -22,6 +22,11 @@ I will also examine the behaviour of the test statistic if the two samples are f
   2. How does the difference in sample size affect the rejection rate?
   3. For non-symmetric distribution, how does the difference in sample sizes affect the power of the test.
 
+# Links
+
+ * [Link to Presentation Slides](https://github.com/ST541-Fall2018/AsanteEmmanuel-project-wilcoxon/blob/master/Location-Shift%20and%20Rejection%20Rates%20in%20Wilcoxon%20Rank%20Sum.pdf)
+ * [Link to Project Report](https://github.com/ST541-Fall2018/AsanteEmmanuel-project-wilcoxon/blob/master/Report/Wilcoxon_Project_Report.pdf)
+
 # Navigation of Code file: Wilcoxon_code.Rmd
 
 You need the `tidyverse` package and the `rsample` package to run the code file.
@@ -48,4 +53,6 @@ The output is silent unless you specifically call for it.
 
 All the other functions are similar to the wilcoxon_one_table. The slight difference is that they have been more specifically tailored to take the parameters of specific distributions as arguments. These functions are `wilcox_norm_table` and `wilcox_skew_table`. The `wilcox_skew_table`
 function, however, takes two distributions; the Poisson and exponential. The function takes the poisson lambda as an argument and ensures that the exponential distribution from which the second sample is to be taken has the same variance as the poisson lambda specified.
+
+
 

@@ -21,6 +21,13 @@ samples are from a symmetric distribution or not.
 3.  For non-symmetric distribution, how does the difference in sample
     sizes affect the power of the test.
 
+# Links
+
+  - [Link to Presentation
+    Slides](https://github.com/ST541-Fall2018/AsanteEmmanuel-project-wilcoxon/blob/master/Location-Shift%20and%20Rejection%20Rates%20in%20Wilcoxon%20Rank%20Sum.pdf)
+  - [Link to Project
+    Report](https://github.com/ST541-Fall2018/AsanteEmmanuel-project-wilcoxon/blob/master/Report/Wilcoxon_Project_Report.pdf)
+
 # Navigation of Code file: Wilcoxon\_code.Rmd
 
 You need the `tidyverse` package and the `rsample` package to run the
